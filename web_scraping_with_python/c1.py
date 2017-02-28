@@ -59,3 +59,30 @@ params = {"strWhere":"OPD=BETWEEN['2016.01.01','2016.07.01']"}
 url = 'http://epub.sipo.gov.cn/gjcx.jsp'
 r = requests.post(url, data=params)
 print r.text
+
+
+js = 'var pato = document.getElementById("pato");setup(pato);pato.pageNow.value = 3;pato.submit();'
+driver.execute_script(js)
+
+soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+pages = soup.select('div[class="next"] > a')
+
+nums = []
+for page_num in pages:
+    try:
+        nums.append(int(page_num.text))
+    except:
+        continue
+    
+for i in range(page_min, 100, 1):
+    old_page_id = driver.find_element_by_tag_name('html').id
+    js = 'javascript:zl_fy(%d);' %i
+    driver.execute_script(js)
+    new_page_id = driver.find_element_by_tag_name('html').id
+    while new_page_id == old_page_id:
+        time.sleep(0.5)
+        new_page_id = driver.find_element_by_tag_name('html').id
+    print 'old is %s, new is %s' %(old_page_id, new_page_id)
+    
+    
